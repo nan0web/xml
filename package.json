@@ -1,0 +1,39 @@
+{
+	"name": "@nan0web/xml",
+	"version": "1.0.0",
+	"description": "XML transformer and utilities.",
+	"type": "module",
+	"main": "./src/index.js",
+	"types": "./types/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./types/index.d.ts",
+			"import": "./src/index.js"
+		}
+	},
+	"scripts": {
+		"build": "tsc",
+		"test": "node --test"
+	},
+	"files": [
+		"src",
+		"types"
+	],
+	"keywords": [
+		"nano",
+		"nan0",
+		"nan0web",
+		"xml",
+		"transformer"
+	],
+	"author": "ЯRаСлав YaRaSLove <support@yaro.page>",
+	"license": "ISC",
+	"devDependencies": {
+		"@nan0web/log": "workspace:*",
+		"@nan0web/types": "workspace:*"
+	},
+	"peerDependencies": {
+		"@nan0web/log": "^1.0.0",
+		"@nan0web/types": "^1.0.0"
+	}
+}
