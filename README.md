@@ -12,6 +12,7 @@
   - [escape](#escape)
   - [nano2attrs](#nano2attrs)
   - [nano2xml](#nano2xml)
+  - [XMLTransformer](#xmltransformer)
 - [Testing](#testing)
 - [Contributing](#contributing)
 - [License](#license)
@@ -153,9 +154,49 @@ console.log(xml) // → '<note id="1">Hello</note>'
 | `defaultTags.$attrCase`   | `Case.KEBAB` | Case style for attribute names (`camel`, `kebab`, `snake`, `pascal`, `upper`, `lower`). |
 | `defaultTags.$attrTrue`   | `''`         | Suffix added when an attribute value is `true`.                                         |
 
+### `XMLTransformer`
+
+XML transformer class that extends the base Transformer class.
+
+```js
+import { XMLTransformer } from "@nan0web/xml"
+
+const transformer = new XMLTransformer({
+  tab: "\t",
+  eol: "\n",
+  defaultTags: new XMLTags()
+})
+
+// Encoding nano object to XML
+const xml = await transformer.encode({ note: "Hello World" })
+console.log(xml) // → '<note>Hello World</note>'
+
+// Decoding XML to nano object (not implemented yet)
+try {
+  const nanoObject = await transformer.decode('<note>Hello World</note>')
+} catch (error) {
+  console.error(error.message) // → 'XMLTransformer.decode() is not implemented yet'
+}
+```
+
+**Properties**
+
+| Property       | Type     | Description                              |
+| -------------- | -------- | ---------------------------------------- |
+| `tab`          | `string` | String used for indentation.             |
+| `eol`          | `string` | String used for line breaks.             |
+| `defaultTags`  | `XMLTags`| Default tag mappings for conversion.     |
+
+**Methods**
+
+| Method       | Description                              |
+| ------------ | ---------------------------------------- |
+| `encode(data)` | Encodes a nano object to XML format.     |
+| `decode(str)`  | Decodes an XML string to a nano object (not implemented). |
+
 ## Testing
 
-The repository ships with a full test suite using Node’s built‑in test runner.
+The repository ships with a full test suite using Node's built‑in test runner.
 
 ```bash
 npm test
@@ -168,6 +209,9 @@ All source files have a corresponding `*.test.js` file under `src/`. The tests c
 - HTML escaping
 - Attribute serialization
 - Full nano→XML conversion (including comments, arrays, self‑closing tags, and custom defaults)
+- XMLTransformer functionality
+
+And README.md has test in `test/`.
 
 ## Contributing
 

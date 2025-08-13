@@ -1,7 +1,8 @@
 import { describe, it, before, after } from "node:test"
 import { NoLogger } from "@nan0web/log"
+import DB from "@nan0web/db-fs"
 import assert from "node:assert/strict"
-import { nano2attrs, nano2xml, defaultXMLTags, Case, XMLTags, escape } from "../src/index.js"
+import { nano2attrs, nano2xml, defaultXMLTags, Case, XMLTags, escape, XMLTransformer } from "../src/index.js"
 
 /**
  * @docs
@@ -19,6 +20,7 @@ import { nano2attrs, nano2xml, defaultXMLTags, Case, XMLTags, escape } from "../
  *   - [escape](#escape)
  *   - [nano2attrs](#nano2attrs)
  *   - [nano2xml](#nano2xml)
+ *   - [XMLTransformer](#xmltransformer)
  * - [Testing](#testing)
  * - [Contributing](#contributing)
  * - [License](#license)
@@ -35,9 +37,12 @@ import { nano2attrs, nano2xml, defaultXMLTags, Case, XMLTags, escape } from "../
 */
 describe("README.md", () => {
 	let originalConsole
+	/** @type {DB} */
+	let db
 	before(() => {
 		originalConsole = console
 		console = new NoLogger({ level: "debug" })
+		db = new DB()
 	})
 	after(() => {
 		console = originalConsole
@@ -174,4 +179,119 @@ describe("README.md", () => {
 		assert.equal(xml, '<note id="1">Hello</note>')
 	})
 
+	/**
+	 * @docs
+	 * **Options**
+	 *
+	 * | Option                    | Default      | Description                                                                             |
+	 * | ------------------------- | ------------ | --------------------------------------------------------------------------------------- |
+	 * | `indent`                  | `'\t'`       | String used for each nesting level.                                                     |
+	 * | `newLine`                 | `'\n'`       | Line break character(s).                                                                |
+	 * | `defaultTags`             | `{}`         | Configuration for default tag names, attribute case, self‑closing logic, etc.           |
+	 * | `defaultTags.$selfClosed` | `undefined`  | Function or boolean; controls self‑closing behaviour.                                   |
+	 * | `defaultTags.$attrCase`   | `Case.KEBAB` | Case style for attribute names (`camel`, `kebab`, `snake`, `pascal`, `upper`, `lower`). |
+	 * | `defaultTags.$attrTrue`   | `''`         | Suffix added when an attribute value is `true`.                                         |
+	 * @stopdocs
+	 */
+	it ("should function nano2xml to be defined", () => {
+		assert.ok(nano2xml)
+	})
+
+	/**
+	 * @docs
+	 * ### `XMLTransformer`
+	 */
+	it("XML transformer class that extends the base Transformer class.", async () => {
+		// import { XMLTransformer } from "@nan0web/xml"
+
+		const transformer = new XMLTransformer({
+			tab: "\t",
+			eol: "\n",
+			defaultTags: new XMLTags()
+		})
+
+		// // Encoding nano object to XML
+		const xml = await transformer.encode({ note: "Hello World" })
+		console.log(xml) // → '<note>Hello World</note>'
+		assert.equal(xml, '<note>Hello World</note>')
+
+		// // Decoding XML to nano object (not implemented yet)
+		try {
+			const nanoObject = await transformer.decode('<note>Hello World</note>')
+		} catch (error) {
+			console.error(error.message) // → 'XMLTransformer.decode() is not implemented yet'
+		// }
+			assert.equal(error.message, 'XMLTransformer.decode() is not implemented yet')
+		}
+	})
+
+	/**
+	 * @docs
+	 * **Properties**
+	 *
+	 * | Property       | Type     | Description                              |
+	 * | -------------- | -------- | ---------------------------------------- |
+	 * | `tab`          | `string` | String used for indentation.             |
+	 * | `eol`          | `string` | String used for line breaks.             |
+	 * | `defaultTags`  | `XMLTags`| Default tag mappings for conversion.     |
+	 *
+	 * **Methods**
+	 *
+	 * | Method       | Description                              |
+	 * | ------------ | ---------------------------------------- |
+	 * | `encode(data)` | Encodes a nano object to XML format.     |
+	 * | `decode(str)`  | Decodes an XML string to a nano object (not implemented). |
+	 * @stopdocs
+	 */
+	it("should XMLTransformer properties exist", () => {
+		const tr = new XMLTransformer()
+		assert.ok("eol" in tr)
+		assert.ok("tab" in tr)
+		assert.ok("defaultTags" in tr)
+	})
+
+	/**
+	 * @docs
+	 * ## Testing
+	 *
+	 * The repository ships with a full test suite using Node's built‑in test runner.
+	 *
+	 * ```bash
+	 * npm test
+	 * ```
+	 *
+	 * All source files have a corresponding `*.test.js` file under `src/`. The tests cover:
+	 *
+	 * - Case transformations
+	 * - XMLTags behaviour
+	 * - HTML escaping
+	 * - Attribute serialization
+	 * - Full nano→XML conversion (including comments, arrays, self‑closing tags, and custom defaults)
+	 * - XMLTransformer functionality
+	 */
+	it ("And README.md has test in `test/.`", async () => {
+		// @stopdocs
+		const data = await db.loadDocument("package.json")
+		assert.ok(data.scripts.test)
+		assert.ok(data.scripts.build)
+	})
+	/**
+	 * @docs
+	 * ## Contributing
+	 */
+	it("Please read [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines on submitting pull requests, code of conduct, and versioning policy.", async () => {
+		// @stopdocs
+		const data = await db.loadDocument("CONTRIBUTING.md")
+		assert.ok(data.includes("# Contributing"))
+	})
+
+	/**
+	 * @docs
+	 * ## License
+	 */
+	it("See the [LICENSE](./LICENSE) file for details.", async () => {
+		// @stopdocs
+		const data = await db.loadDocument("LICENSE")
+		assert.ok(data.includes("ISC License"))
+	})
 })
