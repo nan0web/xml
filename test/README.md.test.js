@@ -147,6 +147,7 @@ describe("README.md", () => {
 	 * ### `nano2attrs`
 	 */
 	it('Serialises an attribute object (`{ $id: "main", $hidden: true }`) to a string suitable for an XML tag.', () => {
+		// import { nano2attrs, Case } from "@nan0web/xml";
 		const a = nano2attrs({ $id: "main", $hidden: true })
 		console.log(a) // → ' id="main" hidden'
 
