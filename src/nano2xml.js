@@ -174,7 +174,7 @@ function nano2xml(data, { indent = '\t', newLine = '\n', defaultTags = {} } = {}
 					}
 
 					const fullOpen = `${currentIndent}<${tag}${attrStr}>`
-					const fullClose = `${currentIndent}</${tag}>`
+					const fullClose = `</${tag}>`
 
 					if (isContentEmpty(content)) {
 						return `${fullOpen}${fullClose}${newLine}`
@@ -189,7 +189,7 @@ function nano2xml(data, { indent = '\t', newLine = '\n', defaultTags = {} } = {}
 					const adjustedContent = contentOutput.endsWith(newLine)
 						? contentOutput.slice(0, -newLine.length)
 						: contentOutput
-					return `${fullOpen}${newLine}${adjustedContent}${newLine}${fullClose}`
+					return `${fullOpen}${newLine}${adjustedContent}${newLine}${currentIndent}${fullClose}`
 				})
 				.join('')
 
