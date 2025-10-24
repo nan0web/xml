@@ -7,7 +7,7 @@ import nano2xml from "./nano2xml.js"
  * Encodes nano objects to XML format, and decodes XML strings to nano objects.
  * @extends Transformer
  */
-class XMLTransformer extends Transformer {
+export default class XMLTransformer extends Transformer {
 	/** @type {string} */
 	tab
 	/** @type {string} */
@@ -20,7 +20,7 @@ class XMLTransformer extends Transformer {
 	 * @param {Object} [options={}] - Options for HTML conversion.
 	 * @param {string} [options.tab='\t'] - The string to use for indentation.
 	 * @param {string} [options.eol='\n'] - The string to use for new lines.
-	 * @param {XMLTags} [options.defaultTags] - The default tag mappings for conversion.
+	 * @param {Object} [options.defaultTags] - The default tag mappings for conversion.
 	 */
 	constructor(options = {}) {
 		super()
@@ -53,5 +53,3 @@ class XMLTransformer extends Transformer {
 		throw new Error('XMLTransformer.decode() is not implemented yet')
 	}
 }
-
-export default XMLTransformer

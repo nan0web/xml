@@ -11,9 +11,9 @@ describe("nano2attrs", () => {
 	})
 
 	it('with custom case and true suffix', () => {
-		const attrs = { $dataValue: 'test' }
-		const defaultTags = { $attrCase: Case.UPPER, $attrTrue: '_flag' }
+		const attrs = { $dataValue: 'test', $active: true }
+		const defaultTags = { $attrCase: Case.UPPER, $attrTrue: '_present' }
 		const result = nano2attrs(attrs, defaultTags)
-		assert.equal(result, ' DATAVALUE="test"')
+		assert.equal(result, ' DATAVALUE="test" ACTIVE_present')
 	})
 })

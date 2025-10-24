@@ -2,7 +2,7 @@
  * Simple container for default XML tag names and a helper to close tags.
  * @class
  */
-class XMLTags {
+export default class XMLTags {
 	/** @type {string} */
 	$default = "element"
 	/** @type {string} */
@@ -24,8 +24,7 @@ class XMLTags {
 	 * @returns {string} Closing string.
 	 */
 	$selfClosed(tag) {
-		return tag.startsWith('?') ? '?>' : `></${tag}>`
+		if (tag.startsWith('?')) return '?>'
+		return `></${tag}>`
 	}
 }
-
-export default XMLTags

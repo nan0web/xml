@@ -1,9 +1,8 @@
-export default XMLTags;
 /**
  * Simple container for default XML tag names and a helper to close tags.
  * @class
  */
-declare class XMLTags {
+export default class XMLTags {
     /** @type {string} */
     $default: string;
     /** @type {string} */

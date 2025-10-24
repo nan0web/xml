@@ -30,7 +30,7 @@ class Case {
 	 * @returns {string} Kebab‑cased string.
 	 */
 	static toKebabCase(str) {
-		return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
+		return str.replace(/([a-z0-9])([A-Z])/g, '$1-$2').replace(/_/g, '-').toLowerCase()
 	}
 	/**
 	 * Convert a string to snake_case.
@@ -38,7 +38,7 @@ class Case {
 	 * @returns {string} Snake‑cased string.
 	 */
 	static toSnakeCase(str) {
-		return str.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase()
+		return str.replace(/([a-z0-9])([A-Z])/g, '$1_$2').replace(/-/g, '_').toLowerCase()
 	}
 	/**
 	 * Convert a string to PascalCase.
@@ -46,7 +46,8 @@ class Case {
 	 * @returns {string} Pascal‑cased string.
 	 */
 	static toPascalCase(str) {
-		return str.replace(/(?:^|-)(.)/g, (_, c) => c.toUpperCase())
+		const camel = Case.toCamelCase(str)
+		return camel.charAt(0).toUpperCase() + camel.slice(1)
 	}
 	/**
 	 * Convert a string to UPPERCASE.
@@ -54,7 +55,8 @@ class Case {
 	 * @returns {string} Upper‑cased string.
 	 */
 	static toUpperCase(str) {
-		return str.toUpperCase()
+		const camel = Case.toCamelCase(str)
+		return camel.toUpperCase()
 	}
 	/**
 	 * Convert a string to lowercase.

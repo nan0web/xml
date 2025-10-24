@@ -1,21 +1,20 @@
-export default XMLTransformer;
 /**
  * Class representing an XML transformer.
  * Encodes nano objects to XML format, and decodes XML strings to nano objects.
  * @extends Transformer
  */
-declare class XMLTransformer extends Transformer {
+export default class XMLTransformer extends Transformer {
     /**
      * Creates a new XMLTransformer instance.
      * @param {Object} [options={}] - Options for HTML conversion.
      * @param {string} [options.tab='\t'] - The string to use for indentation.
      * @param {string} [options.eol='\n'] - The string to use for new lines.
-     * @param {XMLTags} [options.defaultTags] - The default tag mappings for conversion.
+     * @param {Object} [options.defaultTags] - The default tag mappings for conversion.
      */
     constructor(options?: {
         tab?: string | undefined;
         eol?: string | undefined;
-        defaultTags?: XMLTags | undefined;
+        defaultTags?: any;
     } | undefined);
     /** @type {string} */
     tab: string;

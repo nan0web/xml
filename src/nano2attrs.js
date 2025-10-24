@@ -9,14 +9,16 @@ import escape from "./escape.js"
  * @returns {string} Serialized attribute string (including leading spaces).
  */
 function nano2attrs(attrs, defaultTags = {}) {
-	return Object.entries(attrs).map(([attr, value]) => {
-		if (undefined === value) return ''
-		const name = Case.transform(attr.slice(1), defaultTags.$attrCase ?? Case.KEBAB)
-		return (true === value
-			? ` ${name}${defaultTags.$attrTrue ?? ''}`
-			: ` ${name}="${escape(value)}"`
-		)
-	}).join('')
+	const caseType = defaultTags.$attrCase ?? Case.KEBAB
+	return Object.entries(attrs)
+		.filter(([, value]) => value !== undefined)
+		.map(([attr, value]) => {
+			const name = Case.transform(attr.slice(1), caseType)
+			return true === value
+				? ` ${name}${defaultTags.$attrTrue ?? ''}`
+				: ` ${name}="${escape(value)}"`
+		})
+		.join('')
 }
 
 export default nano2attrs
