@@ -104,12 +104,18 @@ function testRender() {
 	 */
 	it("How to transform strings between different cases?", () => {
 		//import { Case } from '@nan0web/xml'
-		assert.equal(Case.toCamelCase('hello-world'), 'helloWorld')
-		assert.equal(Case.toKebabCase('helloWorld'), 'hello-world')
-		assert.equal(Case.toSnakeCase('helloWorld'), 'hello_world')
-		assert.equal(Case.toPascalCase('hello-world'), 'HelloWorld')
-		assert.equal(Case.toUpperCase('hello'), 'HELLO')
-		assert.equal(Case.toLowerCase('HELLO'), 'hello')
+		console.info(Case.toCamelCase('hello-world'))     // ← helloWorld
+		console.info(Case.toKebabCase('helloWorld'))      // ← hello-world
+		console.info(Case.toSnakeCase('helloWorld'))      // ← hello_world
+		console.info(Case.toPascalCase('hello-world'))    // ← HelloWorld
+		console.info(Case.toUpperCase('hello'))           // ← HELLO
+		console.info(Case.toLowerCase('HELLO'))           // ← hello
+		assert.equal(console.output()[0][1], 'helloWorld')
+		assert.equal(console.output()[1][1], 'hello-world')
+		assert.equal(console.output()[2][1], 'hello_world')
+		assert.equal(console.output()[3][1], 'HelloWorld')
+		assert.equal(console.output()[4][1], 'HELLO')
+		assert.equal(console.output()[5][1], 'hello')
 	})
 	/**
 	 * @docs
@@ -117,12 +123,18 @@ function testRender() {
 	it("How to use Case.transform with type constants?", () => {
 		//import { Case } from '@nan0web/xml'
 		const input = 'my_string-value'
-		assert.equal(Case.transform(input, Case.CAMEL), 'myStringValue')
-		assert.equal(Case.transform(input, Case.KEBAB), 'my-string-value')
-		assert.equal(Case.transform(input, Case.SNAKE), 'my_string_value')
-		assert.equal(Case.transform(input, Case.PASCAL), 'MyStringValue')
-		assert.equal(Case.transform(input, Case.UPPER), 'MYSTRINGVALUE')
-		assert.equal(Case.transform('MyVar', Case.LOWER), 'myvar')
+		console.info(Case.transform(input, Case.CAMEL))   // ← myStringValue
+		console.info(Case.transform(input, Case.KEBAB))   // ← my-string-value
+		console.info(Case.transform(input, Case.SNAKE))   // ← my_string_value
+		console.info(Case.transform(input, Case.PASCAL))  // ← MyStringValue
+		console.info(Case.transform(input, Case.UPPER))   // ← MYSTRINGVALUE
+		console.info(Case.transform('MyVar', Case.LOWER)) // ← myvar
+		assert.equal(console.output()[0][1], 'myStringValue')
+		assert.equal(console.output()[1][1], 'my-string-value')
+		assert.equal(console.output()[2][1], 'my_string_value')
+		assert.equal(console.output()[3][1], 'MyStringValue')
+		assert.equal(console.output()[4][1], 'MYSTRINGVALUE')
+		assert.equal(console.output()[5][1], 'myvar')
 	})
 
 	/**
@@ -135,7 +147,7 @@ function testRender() {
 		//import { escape } from '@nan0web/xml'
 		const input = `&<>"'`
 		const result = escape(input)
-		console.info(result)
+		console.info(result) // ← &amp;&lt;&gt;&quot;&#039;
 		assert.equal(console.output()[0][1], '&amp;&lt;&gt;&quot;&#039;')
 	})
 	/**
@@ -145,7 +157,7 @@ function testRender() {
 		//import { escape } from '@nan0web/xml'
 		const input = `&<>"'`
 		const result = escape(input, ['<', '>'])
-		console.info(result)
+		console.info(result) // ← &amp;<>&quot;&#039;
 		assert.equal(console.output()[0][1], '&amp;<>&quot;&#039;')
 	})
 	/**
@@ -153,12 +165,12 @@ function testRender() {
 	 */
 	it("How to escape non-string primitives?", () => {
 		//import { escape } from '@nan0web/xml'
-		console.info(escape(123))
-		console.info(escape(true))
-		console.info(escape(BigInt(42)))
+		console.info(escape(123)) // ← 123
+		console.info(escape(true)) // ← true
+		console.info(escape(BigInt(420))) // ← 420
 		assert.equal(console.output()[0][1], '123')
 		assert.equal(console.output()[1][1], 'true')
-		assert.equal(console.output()[2][1], '42')
+		assert.equal(console.output()[2][1], '420')
 	})
 
 	/**
@@ -171,7 +183,7 @@ function testRender() {
 		//import { nano2attrs } from '@nan0web/xml'
 		const attrs = { $id: 'main', $hidden: true, $title: 'Hello & World' }
 		const result = nano2attrs(attrs)
-		console.info(result)
+		console.info(result) // ← ` id="main" hidden title="Hello &amp; World"`
 		assert.equal(console.output()[0][1], ' id="main" hidden title="Hello &amp; World"')
 	})
 	/**
@@ -182,7 +194,7 @@ function testRender() {
 		const attrs = { $dataValue: 'test', $active: true }
 		const defaultTags = { $attrCase: Case.UPPER, $attrTrue: '_present' }
 		const result = nano2attrs(attrs, defaultTags)
-		console.info(result)
+		console.info(result) // ← ` DATAVALUE="test" ACTIVE_present`
 		assert.equal(console.output()[0][1], ' DATAVALUE="test" ACTIVE_present')
 	})
 	/**
@@ -192,7 +204,7 @@ function testRender() {
 		//import { nano2attrs } from '@nan0web/xml'
 		const attrs = { $id: 'test', $class: undefined, $value: 'ok' }
 		const result = nano2attrs(attrs)
-		console.info(result)
+		console.info(result) // ← ` id="test" value="ok"`
 		assert.equal(console.output()[0][1], ' id="test" value="ok"')
 	})
 
@@ -206,8 +218,22 @@ function testRender() {
 		//import { nano2xml } from '@nan0web/xml'
 		const data = { $id: "1", note: "Hello" }
 		const xml = nano2xml(data, { indent: '  ', newLine: '\n' })
-		console.info(xml)
+		console.info(xml) // ← `<note id="1">Hello</note>`
 		assert.equal(console.output()[0][1].trim(), '<note id="1">Hello</note>')
+	})
+	/**
+	 * @docs
+	 */
+	it("How to handle arrays with default tag wrapping?", () => {
+		//import { nano2xml } from '@nan0web/xml'
+		const data = [{ item: 'A' }, { item: 'B' }]
+		const xml = nano2xml(data, {
+			indent: '',
+			newLine: '',
+			defaultTags: { '': 'item' }
+		})
+		console.info(xml) // ← `<item>A</item><item>B</item>`
+		assert.equal(console.output()[0][1], '<item>A</item><item>B</item>')
 	})
 	/**
 	 * @docs
@@ -221,7 +247,7 @@ function testRender() {
 				$attrCase: 'kebab'
 			}
 		})
-		console.info(xml.trim())
+		console.info(xml.trim()) // ← `<img src="pic.png" />`
 		assert.equal(console.output()[0][1], '<img src="pic.png" />')
 	})
 	/**
@@ -232,7 +258,7 @@ function testRender() {
 		const data = { br: '' }
 		const defaultTags = { $selfClosed: true }
 		const xml = nano2xml(data, { defaultTags })
-		console.info(xml)
+		console.info(xml) // ← `<br />`
 		assert.equal(console.output()[0][1], '<br />')
 	})
 	/**
@@ -242,18 +268,18 @@ function testRender() {
 		//import { nano2xml } from '@nan0web/xml'
 		const data = { root: true, '#comment': 'This is a comment' }
 		const xml = nano2xml(data, { indent: '\t', newLine: '\n' })
-		console.info(xml)
+		console.info(xml) // ← `<!-- comment: This is a comment -->\n<root></root>`
 		assert.equal(console.output()[0][1], '<!-- comment: This is a comment -->\n<root></root>')
 	})
 	/**
 	 * @docs
 	 */
-	it("How to render element with embedded attributes (e.g. div.main\#id)?", () => {
+	it("How to render element with embedded attributes (e.g. div.main#id)?", () => {
 		//import { nano2xml } from '@nan0web/xml'
 		const data = { 'div.container#main': 'Content' }
 		const defaultTags = { $tagAttrs: { '#': 'id', '.': 'class' } }
 		const xml = nano2xml(data, { defaultTags })
-		console.info(xml)
+		console.info(xml) // ← `<div id="main" class="container">Content</div>`
 		assert.equal(console.output()[0][1], '<div id="main" class="container">Content</div>')
 	})
 
@@ -266,11 +292,16 @@ function testRender() {
 	it("How to create and use custom XMLTags configuration?", () => {
 		//import { XMLTags } from '@nan0web/xml'
 		const tags = new XMLTags()
-		assert.equal(tags.$default, 'element')
-		assert.equal(tags.books, 'book')
-		assert.equal(tags.library, 'section')
-		assert.equal(tags.$selfClosed('note'), '></note>')
-		assert.equal(tags.$selfClosed('?xml'), '?>')
+		console.info(tags.$default) // ← element
+		console.info(tags.books) // ← book
+		console.info(tags.library) // ← section
+		console.info(tags.$selfClosed('note')) // ← ></note>
+		console.info(tags.$selfClosed('?xml')) // ← ?>
+		assert.equal(console.output()[0][1], 'element')
+		assert.equal(console.output()[1][1], 'book')
+		assert.equal(console.output()[2][1], 'section')
+		assert.equal(console.output()[3][1], '></note>')
+		assert.equal(console.output()[4][1], '?>')
 	})
 
 	/**
@@ -282,9 +313,12 @@ function testRender() {
 	it("How to create XMLTransformer with default options?", () => {
 		//import { XMLTransformer } from '@nan0web/xml'
 		const transformer = new XMLTransformer()
-		assert.equal(transformer.tab, '\t')
-		assert.equal(transformer.eol, '\n')
-		assert.ok(transformer.defaultTags instanceof XMLTags)
+		console.info(transformer.tab) // ← \t
+		console.info(transformer.eol) // ← \n
+		console.info(transformer.defaultTags instanceof XMLTags) // ← true
+		assert.equal(console.output()[0][1], '\t')
+		assert.equal(console.output()[1][1], '\n')
+		assert.ok(console.output()[2][1])
 	})
 	/**
 	 * @docs
@@ -297,9 +331,12 @@ function testRender() {
 			eol: '\r\n',
 			defaultTags: customTags
 		})
-		assert.equal(transformer.tab, '  ')
-		assert.equal(transformer.eol, '\r\n')
-		assert.strictEqual(transformer.defaultTags, customTags)
+		console.info(transformer.tab) // ←    (2 spaces)
+		console.info(transformer.eol) // ← \r\n
+		console.info(transformer.defaultTags) // ← XMLTags { ... }
+		assert.equal(console.output()[0][1], '  ')
+		assert.equal(console.output()[1][1], '\r\n')
+		assert.strictEqual(console.output()[2][1], customTags)
 	})
 	/**
 	 * @docs
@@ -309,7 +346,7 @@ function testRender() {
 		const transformer = new XMLTransformer()
 		const data = { note: 'Hello World' }
 		const xml = await transformer.encode(data)
-		console.info(xml)
+		console.info(xml) // ← `<note>Hello World</note>`
 		assert.equal(console.output()[0][1], '<note>Hello World</note>')
 	})
 	/**
@@ -323,6 +360,7 @@ function testRender() {
 			async () => await transformer.decode(xmlString),
 			{ message: 'XMLTransformer.decode() is not implemented yet' }
 		)
+		assert.ok(xmlString)
 	})
 
 	/**
@@ -427,10 +465,10 @@ function testRender() {
 		 * git clone https://github.com/nan0web/xml.git
 		 * cd xml
 		 * npm install
-		 * npm run playground
+		 * npm run play
 		 * ```
 		 */
-		assert.ok(String(pkg.scripts?.playground))
+		assert.ok(String(pkg.scripts?.play))
 		const response = await runSpawn("git", ["remote", "get-url", "origin"])
 		assert.ok(response.code === 0, "git command fails (e.g., not in a git repo)")
 		assert.ok(response.text.trim().endsWith(":nan0web/xml.git"))

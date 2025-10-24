@@ -86,23 +86,56 @@ function nano2xml(data, { indent = '\t', newLine = '\n', defaultTags = {} } = {}
 	function convertToXml(obj, currentIndent = '', parent = null, prev = null) {
 		let xml = ''
 
-		// Handle arrays - wrap each item in default tag if specified
+		// Handle arrays
 		if (Array.isArray(obj)) {
 			const tag = defaultTags[parent ?? '']
-			xml += obj.map((el, index) => {
-				let processedEl = el
-				if (tag && typeof el === 'object' && el !== null && Object.values(defaultTags).includes(tag)) {
-					if (Object.keys(el).length === 1 && el[tag] !== undefined) {
-						processedEl = el[tag]
+			if (tag) {
+				// Render each array item as <tag>content</tag>
+				const itemStrs = obj.map((el) => {
+					let content = el
+					let itemAttrs = {}
+					if (typeof el === 'object' && el !== null) {
+						Object.entries(el).forEach(([key, value]) => {
+							if (key === tag) {
+								content = value
+							} else if (key.startsWith('$')) {
+								itemAttrs[key] = value
+							}
+							// Ignore other keys
+						})
 					}
-				}
-				const isElNotTag = tag && el[tag] === undefined
-				const xmlStr = isElNotTag
-					? convertToXml({ [tag]: processedEl }, currentIndent, parent, prev)
-					: convertToXml(processedEl, currentIndent, tag ?? parent, prev)
-				prev = el
-				return xmlStr
-			}).join('')
+					const contentXml = convertToXml(content, currentIndent + indent, tag, el)
+					const attrStr = nano2attrs(itemAttrs, defaultTags)
+					let selfClosedLogic = defaultTags.$selfClosed
+					if (typeof selfClosedLogic === 'function') {
+						selfClosedLogic = selfClosedLogic.call(defaultTags, tag, content)
+					}
+					const isEmptyContent = isContentEmpty(content)
+					const isSelfClosedTag = !!selfClosedLogic && isEmptyContent
+					const openTag = `${currentIndent}<${tag}${attrStr}>`
+					const closeTag = `</${tag}>`
+					if (isSelfClosedTag) {
+						const closeStr = typeof selfClosedLogic === 'boolean' ? ` />` : selfClosedLogic
+						return `${currentIndent}<${tag}${attrStr}${closeStr}`
+					}
+					if (isEmptyContent) {
+						return `${openTag}${closeTag}`
+					}
+					if (isSingleLine(content)) {
+						return `${openTag}${contentXml}${closeTag}`
+					}
+					// Block content
+					let blockContent = contentXml
+					if (newLine && blockContent.endsWith(newLine)) {
+						blockContent = blockContent.slice(0, -newLine.length)
+					}
+					return `${openTag}${newLine}${blockContent}${newLine}${currentIndent}${closeTag}`
+				})
+				xml += itemStrs.join(newLine)
+			} else {
+				// No wrapping tag: render children as siblings
+				xml += obj.map((el) => convertToXml(el, currentIndent, parent, prev)).join(newLine)
+			}
 		}
 
 		// Handle objects
@@ -145,64 +178,71 @@ function nano2xml(data, { indent = '\t', newLine = '\n', defaultTags = {} } = {}
 				}
 			}
 
-			// Render comments first
-			xml += Object.entries(comments)
-				.map(([comment, value]) => `${currentIndent}<!-- ${comment.slice(1)}${value !== true && value ? `: ${value}` : ''} -->${newLine}`)
-				.join('')
+			// Render comments
+			const commentStrs = Object.entries(comments).map(([commentKey, value]) => {
+				const text = `${commentKey.slice(1)}${value !== true && value ? `: ${value}` : ''}`
+				return `${currentIndent}<!-- ${text} -->`
+			})
 
 			// Render tags/processing instructions
-			xml += Object.entries(tags)
-				.map(([tag, content]) => {
-					let $selfClosed = defaultTags.$selfClosed
-					if (typeof $selfClosed === 'function') {
-						$selfClosed = $selfClosed.call(defaultTags, tag, content)
-					}
-					const isSelfClosed = !!$selfClosed && isContentEmpty(content)
+			const tagStrs = Object.entries(tags).map(([tag, content]) => {
+				let $selfClosed = defaultTags.$selfClosed
+				if (typeof $selfClosed === 'function') {
+					$selfClosed = $selfClosed.call(defaultTags, tag, content)
+				}
+				const isSelfClosedContent = !!$selfClosed && isContentEmpty(content)
+				const attrStr = nano2attrs(attrs, defaultTags)
 
-					// Special handling for processing instructions
-					if (tag.startsWith('?')) {
-						const attrStr = nano2attrs(attrs, defaultTags)
-						const closeStr = $selfClosed || '?>'
-						return `<${tag}${attrStr}${closeStr}${newLine}`
-					}
+				// Special handling for processing instructions
+				if (tag.startsWith('?')) {
+					const closeStr = $selfClosed || '?>'
+					return `<${tag}${attrStr}${closeStr}`
+				}
 
-					const attrStr = nano2attrs(attrs, defaultTags)
+				if (isSelfClosedContent) {
+					const closeStr = typeof $selfClosed === 'boolean' ? ' />' : $selfClosed
+					return `${currentIndent}<${tag}${attrStr}${closeStr}`
+				}
 
-					if (isSelfClosed) {
-						const closeStr = typeof $selfClosed === 'boolean' ? ' />' : $selfClosed
-						return `${currentIndent}<${tag}${attrStr}${closeStr}${newLine}`
-					}
+				const fullOpen = `${currentIndent}<${tag}${attrStr}>`
+				const fullClose = `</${tag}>`
 
-					const fullOpen = `${currentIndent}<${tag}${attrStr}>`
-					const fullClose = `</${tag}>`
+				if (isContentEmpty(content)) {
+					return `${fullOpen}${fullClose}`
+				}
 
-					if (isContentEmpty(content)) {
-						return `${fullOpen}${fullClose}${newLine}`
-					}
+				if (isSingleLine(content)) {
+					return `${fullOpen}${escape(content)}${fullClose}`
+				}
 
-					if (isSingleLine(content)) {
-						return `${fullOpen}${escape(content)}${fullClose}${newLine}`
-					}
+				// Block content
+				const contentOutput = convertToXml(content, currentIndent + indent, tag)
+				let adjustedContent = contentOutput
+				if (newLine && adjustedContent.endsWith(newLine)) {
+					adjustedContent = adjustedContent.slice(0, -newLine.length)
+				}
+				return `${fullOpen}${newLine}${adjustedContent}${newLine}${currentIndent}${fullClose}`
+			})
 
-					// Block content
-					const contentOutput = convertToXml(content, currentIndent + indent, tag)
-					const adjustedContent = contentOutput.endsWith(newLine)
-						? contentOutput.slice(0, -newLine.length)
-						: contentOutput
-					return `${fullOpen}${newLine}${adjustedContent}${newLine}${currentIndent}${fullClose}`
-				})
-				.join('')
-
-			// Trim trailing newline if present
-			if (xml.endsWith(newLine)) {
-				xml = xml.slice(0, -newLine.length)
+			// Combine sections with newLine separator
+			const sections = []
+			if (commentStrs.length > 0) {
+				sections.push(commentStrs.join(newLine))
 			}
+			if (tagStrs.length > 0) {
+				sections.push(tagStrs.join(newLine))
+			}
+			xml += sections.join(newLine)
 		}
 
 		// Handle primitives
 		else {
-			const tag = defaultTags[parent ?? ""] ?? false
-			xml += tag ? convertToXml({ [tag]: obj }, currentIndent, parent) : escape(obj)
+			xml += escape(obj)
+		}
+
+		// Trim trailing newline if present (only if newLine is non-empty)
+		if (newLine && xml.endsWith(newLine)) {
+			xml = xml.slice(0, -newLine.length)
 		}
 
 		// Trim leading newline for root

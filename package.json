@@ -46,7 +46,8 @@
 		"@nan0web/db-fs": "^1.0.0",
 		"@nan0web/log": "^1.0.0",
 		"@nan0web/transformer": "^1.0.0",
-		"@nan0web/types": "^1.0.2"
+		"@nan0web/types": "^1.0.2",
+		"@nan0web/ui-cli": "^1.0.0"
 	},
 	"peerDependencies": {
 		"@nan0web/db": "^1.0.0",

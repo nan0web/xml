@@ -4,7 +4,7 @@
 
 |[Статус](https://github.com/nan0web/monorepo/blob/main/system.md#написання-сценаріїв)|Документація|Покриття тестами|Можливості|Npm версія|
 |---|---|---|---|---|
- |🟢 `98.6%` |🧪 [English 🏴󠁧󠁢󠁥󠁮󠁧󠁿](https://github.com/nan0web/xml/blob/main/README.md)<br />[Українською 🇺🇦](https://github.com/nan0web/xml/blob/main/docs/uk/README.md) |🟢 `93.1%` |✅ d.ts 📜 system.md 🕹️ playground |— |
+ |🟢 `98.6%` |🧪 [English 🏴󠁧󠁢󠁥󠁮󠁧󠁿](https://github.com/nan0web/xml/blob/main/README.md)<br />[Українською 🇺🇦](https://github.com/nan0web/xml/blob/main/docs/uk/README.md) |🟢 `93.5%` |✅ d.ts 📜 system.md 🕹️ playground |— |
 
 ## Опис
 
@@ -42,17 +42,29 @@ yarn add @nan0web/xml
 
 ### Трансформація рядків
 
-Використовуйте `Case`, щоб перетворювати рядки між різними стилями написання.
+Використовуйте `Case` для перетворення рядків між різними конвенціями іменування.
 
 Як перетворювати рядки між різними стилями?
 ```js
 import { Case } from '@nan0web/xml'
+console.info(Case.toCamelCase('hello-world'))     // ← helloWorld
+console.info(Case.toKebabCase('helloWorld'))      // ← hello-world
+console.info(Case.toSnakeCase('helloWorld'))      // ← hello_world
+console.info(Case.toPascalCase('hello-world'))    // ← HelloWorld
+console.info(Case.toUpperCase('hello'))           // ← HELLO
+console.info(Case.toLowerCase('HELLO'))           // ← hello
 ```
 
 Як використовувати Case.transform з константами типу?
 ```js
 import { Case } from '@nan0web/xml'
 const input = 'my_string-value'
+console.info(Case.transform(input, Case.CAMEL))   // ← myStringValue
+console.info(Case.transform(input, Case.KEBAB))   // ← my-string-value
+console.info(Case.transform(input, Case.SNAKE))   // ← my_string_value
+console.info(Case.transform(input, Case.PASCAL))  // ← MyStringValue
+console.info(Case.transform(input, Case.UPPER))   // ← MYSTRINGVALUE
+console.info(Case.transform('MyVar', Case.LOWER)) // ← myvar
 ```
 
 ### Екранування небезпечних символів
@@ -64,7 +76,7 @@ const input = 'my_string-value'
 import { escape } from '@nan0web/xml'
 const input = `&<>"'`
 const result = escape(input)
-console.info(result)
+console.info(result) // ← &amp;&lt;&gt;&quot;&#039;
 ```
 
 Як екранувати, ігноруючи певні символи?
@@ -72,15 +84,15 @@ console.info(result)
 import { escape } from '@nan0web/xml'
 const input = `&<>"'`
 const result = escape(input, ['<', '>'])
-console.info(result)
+console.info(result) // ← &amp;<>&quot;&#039;
 ```
 
 Як екранувати примітиви, що не є рядками?
 ```js
 import { escape } from '@nan0web/xml'
-console.info(escape(123))
-console.info(escape(true))
-console.info(escape(BigInt(42)))
+console.info(escape(123)) // ← 123
+console.info(escape(true)) // ← true
+console.info(escape(BigInt(420))) // ← 420
 ```
 
 ### Перетворення атрибутів на рядки XML
@@ -92,7 +104,7 @@ console.info(escape(BigInt(42)))
 import { nano2attrs } from '@nan0web/xml'
 const attrs = { $id: 'main', $hidden: true, $title: 'Hello & World' }
 const result = nano2attrs(attrs)
-console.info(result)
+console.info(result) // ← ` id="main" hidden title="Hello &amp; World"`
 ```
 
 Як налаштувати регістр атрибутів та суфікс для true?
@@ -101,15 +113,15 @@ import { nano2attrs, Case } from '@nan0web/xml'
 const attrs = { $dataValue: 'test', $active: true }
 const defaultTags = { $attrCase: Case.UPPER, $attrTrue: '_present' }
 const result = nano2attrs(attrs, defaultTags)
-console.info(result)
+console.info(result) // ← ` DATAVALUE="test" ACTIVE_present`
 ```
 
-Як пропускати атрибути зі значенням undefined?
+Як пропускати невизначені атрибути у виводі?
 ```js
 import { nano2attrs } from '@nan0web/xml'
 const attrs = { $id: 'test', $class: undefined, $value: 'ok' }
 const result = nano2attrs(attrs)
-console.info(result)
+console.info(result) // ← ` id="test" value="ok"`
 ```
 
 ### Перетворення нано-об’єктів у XML
@@ -121,10 +133,22 @@ console.info(result)
 import { nano2xml } from '@nan0web/xml'
 const data = { $id: "1", note: "Hello" }
 const xml = nano2xml(data, { indent: '  ', newLine: '\n' })
-console.info(xml)
+console.info(xml) // ← `<note id="1">Hello</note>`
 ```
 
-Як працювати з самозакривними тегами?
+Як обробляти масиви з обгортанням тегу за замовчуванням?
+```js
+import { nano2xml } from '@nan0web/xml'
+const data = [{ item: 'A' }, { item: 'B' }]
+const xml = nano2xml(data, {
+  indent: '',
+  newLine: '',
+  defaultTags: { '': 'item' }
+})
+console.info(xml) // ← `<item>A</item><item>B</item>`
+```
+
+Як обробляти самозакривні теги?
 ```js
 import { nano2xml } from '@nan0web/xml'
 const data = { img: true, $src: 'pic.png' }
@@ -134,7 +158,7 @@ const xml = nano2xml(data, {
     $attrCase: 'kebab'
   }
 })
-console.info(xml.trim())
+console.info(xml.trim()) // ← `<img src="pic.png" />`
 ```
 
 Як обробляти порожній вміст і логіку самозакриття?
@@ -143,7 +167,7 @@ import { nano2xml } from '@nan0web/xml'
 const data = { br: '' }
 const defaultTags = { $selfClosed: true }
 const xml = nano2xml(data, { defaultTags })
-console.info(xml)
+console.info(xml) // ← `<br />`
 ```
 
 Як рендерити коментарі у XML?
@@ -151,16 +175,16 @@ console.info(xml)
 import { nano2xml } from '@nan0web/xml'
 const data = { root: true, '#comment': 'This is a comment' }
 const xml = nano2xml(data, { indent: '\t', newLine: '\n' })
-console.info(xml)
+console.info(xml) // ← `<!-- comment: This is a comment -->\n<root></root>`
 ```
 
-Як рендерити елемент із вбудованими атрибутами (наприклад, div.main\#id)?
+Як рендерити елемент із вбудованими атрибутами (наприклад, div.main#id)?
 ```js
 import { nano2xml } from '@nan0web/xml'
 const data = { 'div.container#main': 'Content' }
 const defaultTags = { $tagAttrs: { '#': 'id', '.': 'class' } }
 const xml = nano2xml(data, { defaultTags })
-console.info(xml)
+console.info(xml) // ← `<div id="main" class="container">Content</div>`
 ```
 
 ### Використання конфігурації XMLTags
@@ -171,6 +195,11 @@ console.info(xml)
 ```js
 import { XMLTags } from '@nan0web/xml'
 const tags = new XMLTags()
+console.info(tags.$default) // ← element
+console.info(tags.books) // ← book
+console.info(tags.library) // ← section
+console.info(tags.$selfClosed('note')) // ← ></note>
+console.info(tags.$selfClosed('?xml')) // ← ?>
 ```
 
 ### Використання XMLTransformer
@@ -181,6 +210,9 @@ const tags = new XMLTags()
 ```js
 import { XMLTransformer } from '@nan0web/xml'
 const transformer = new XMLTransformer()
+console.info(transformer.tab) // ← \t
+console.info(transformer.eol) // ← \n
+console.info(transformer.defaultTags instanceof XMLTags) // ← true
 ```
 
 Як створити XMLTransformer з власними опціями?
@@ -192,6 +224,9 @@ const transformer = new XMLTransformer({
   eol: '\r\n',
   defaultTags: customTags
 })
+console.info(transformer.tab) // ←    (2 пробіли)
+console.info(transformer.eol) // ← \r\n
+console.info(transformer.defaultTags) // ← XMLTags { ... }
 ```
 
 Як кодувати дані у XML за допомогою XMLTransformer?
@@ -200,7 +235,7 @@ import { XMLTransformer } from '@nan0web/xml'
 const transformer = new XMLTransformer()
 const data = { note: 'Hello World' }
 const xml = await transformer.encode(data)
-console.info(xml)
+console.info(xml) // ← `<note>Hello World</note>`
 ```
 
 Як переконатися, що метод decode ще не реалізовано?
@@ -212,81 +247,83 @@ await assert.rejects(
   async () => await transformer.decode(xmlString),
   { message: 'XMLTransformer.decode() is not implemented yet' }
 )
-})
 ```
 
-/**
- * @docs
- * ## API
- *
- * ### Case
- *
- * Службовий клас для трансформації регістру рядків.
- *
- * * **Статичні константи**
- *   * `Case.CAMEL` – "camel"
- *   * `Case.KEBAB` – "kebab"
- *   * `Case.SNAKE` – "snake"
- *   * `Case.PASCAL` – "pascal"
- *   * `Case.UPPER` – "upper"
- *   * `Case.LOWER` – "lower"
- *
- * * **Методи**
- *   * `toCamelCase(str)` – перетворює на camelCase.
- *   * `toKebabCase(str)` – перетворює на kebab-case.
- *   * `toSnakeCase(str)` – перетворює на snake_case.
- *   * `toPascalCase(str)` – перетворює на PascalCase.
- *   * `toUpperCase(str)` – перетворює на UPPERCASE.
- *   * `toLowerCase(str)` – перетворює на lowercase.
- *   * `static transform(str, type)` – застосовує вказане перетворення регістру.
- *
- * ### escape(unsafe, ignore = [])
- *
- * Екранує спеціальні символи XML у рядку.
- * * **Параметри**
- *   * `unsafe` – значення для екранування (рядок, число, булеве, bigint).
- *   * `ignore` – необов’язковий масив символів, які слід пропустити.
- * * **Повертає** – екранований рядок.
- *
- * ### nano2attrs(attrs, defaultTags = {})
- *
- * Перетворює об’єкт атрибутів на рядок атрибутів XML.
- * * **Параметри**
- *   * `attrs` – об’єкт, у якому ключі починаються з `$`.
- *   * `defaultTags` – об’єкт конфігурації з `$attrCase` та `$attrTrue`.
- * * **Повертає** – серіалізований рядок атрибутів (з початковими пробілами).
- *
- * ### nano2xml(data, { indent, newLine, defaultTags })
- *
- * Перетворює нано-подібну структуру JS на рядок XML.
- * * **Параметри**
- *   * `data` – вхідна структура даних.
- *   * `indent` – рядок відступу (за замовчуванням: `\t`).
- *   * `newLine` – рядок нового рядка (за замовчуванням: `\n`).
- *   * `defaultTags` – конфігурація тегів (наприклад, `$selfClosed`, `$tagAttrs`, правила регістру).
- * * **Повертає** – форматований рядок XML.
- *
- * ### XMLTags
- *
- * Теги за замовчуванням і допоміжні методи.
- * * **Властивості**
- *   * `$default` – резервне ім’я тега.
- *   * `books`, `library`, `catalog`, `employees`, `department` – вбудовані відображення тегів.
- * * **Методи**
- *   * `$selfClosed(tag)` – повертає `?>` для PI-тегів, `></tag>` інакше.
- *
- * ### XMLTransformer
- *
- * Клас для кодування нано-об’єктів у XML.
- * * **Властивості**
- *   * `tab` – рядок відступу.
- *   * `eol` – рядок кінця рядка.
- *   * `defaultTags` – екземпляр XMLTags.
- * * **Методи**
- *   * `constructor(options)` – приймає `tab`, `eol`, `defaultTags`.
- *   * `encode(data)` – перетворює нано-об’єкт на рядок XML.
- *   * `decode(str)` – *(не реалізовано)* викидає помилку.
- */
+## API
+
+### Case
+
+Службовий клас для трансформації регістру рядків.
+
+* **Статичні константи**
+  * `Case.CAMEL` – "camel"
+  * `Case.KEBAB` – "kebab"
+  * `Case.SNAKE` – "snake"
+  * `Case.PASCAL` – "pascal"
+  * `Case.UPPER` – "upper"
+  * `Case.LOWER` – "lower"
+
+* **Методи**
+  * `toCamelCase(str)` – перетворює на camelCase.
+  * `toKebabCase(str)` – перетворює на kebab-case.
+  * `toSnakeCase(str)` – перетворює на snake_case.
+  * `toPascalCase(str)` – перетворює на PascalCase.
+  * `toUpperCase(str)` – перетворює на UPPERCASE.
+  * `toLowerCase(str)` – перетворює на lowercase.
+  * `static transform(str, type)` – застосовує вказане перетворення регістру.
+
+### escape(unsafe, ignore = [])
+
+Екранує спеціальні символи XML у рядку.
+
+* **Параметри**
+  * `unsafe` – значення для екранування (рядок, число, булеве, bigint).
+  * `ignore` – необов’язковий масив символів, які слід пропустити.
+* **Повертає** – екранований рядок.
+
+### nano2attrs(attrs, defaultTags = {})
+
+Перетворює об’єкт атрибутів на рядок атрибутів XML.
+
+* **Параметри**
+  * `attrs` – об’єкт, у якому ключі починаються з `$`.
+  * `defaultTags` – об’єкт конфігурації з `$attrCase` та `$attrTrue`.
+* **Повертає** – серіалізований рядок атрибутів (з початковими пробілами).
+
+### nano2xml(data, { indent, newLine, defaultTags })
+
+Перетворює нано-подібну структуру JS на рядок XML.
+
+* **Параметри**
+  * `data` – вхідна структура даних.
+  * `indent` – рядок відступу (за замовчуванням: `\t`).
+  * `newLine` – рядок нового рядка (за замовчуванням: `\n`).
+  * `defaultTags` – конфігурація тегів (наприклад, `$selfClosed`, `$tagAttrs`, правила регістру).
+* **Повертає** – форматований рядок XML.
+
+### XMLTags
+
+Теги за замовчуванням і допоміжні методи.
+
+* **Властивості**
+  * `$default` – резервне ім’я тега.
+  * `books`, `library`, `catalog`, `employees`, `department` – вбудовані відображення тегів.
+* **Методи**
+  * `$selfClosed(tag)` – повертає `?>` для PI-тегів, `></tag>` інакше.
+
+### XMLTransformer
+
+Клас для кодування нано-об’єктів у XML.
+
+* **Властивості**
+  * `tab` – рядок відступу.
+  * `eol` – рядок кінця рядка.
+  * `defaultTags` – екземпляр XMLTags.
+* **Методи**
+  * `constructor(options)` – приймає `tab`, `eol`, `defaultTags`.
+  * `encode(data)` – перетворює нано-об’єкт на рядок XML.
+  * `decode(str)` – *(не реалізовано)* викидає помилку.
+
 Всі експортовані функції та класи мають бути доступні.
 
 ## Java•Script
@@ -303,7 +340,7 @@ await assert.rejects(
 git clone https://github.com/nan0web/xml.git
 cd xml
 npm install
-npm run playground
+npm run play
 ```
 
 ## Участь у розробці
