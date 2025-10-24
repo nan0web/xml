@@ -230,7 +230,7 @@ function testRender() {
 		const xml = nano2xml(data, {
 			indent: '',
 			newLine: '',
-			defaultTags: { '': 'item' }
+			defaultTags: { $default: 'item' }
 		})
 		console.info(xml) // ← `<item>A</item><item>B</item>`
 		assert.equal(console.output()[0][1], '<item>A</item><item>B</item>')
@@ -243,7 +243,7 @@ function testRender() {
 		const data = { img: true, $src: 'pic.png' }
 		const xml = nano2xml(data, {
 			defaultTags: {
-				$selfClosed: (tag) => tag === 'img' && true,
+				$selfClosed: (tag) => tag === 'img',
 				$attrCase: 'kebab'
 			}
 		})

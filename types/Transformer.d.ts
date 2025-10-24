@@ -9,12 +9,12 @@ export default class XMLTransformer extends Transformer {
      * @param {Object} [options={}] - Options for HTML conversion.
      * @param {string} [options.tab='\t'] - The string to use for indentation.
      * @param {string} [options.eol='\n'] - The string to use for new lines.
-     * @param {Object} [options.defaultTags] - The default tag mappings for conversion.
+     * @param {XMLTags} [options.defaultTags] - The default tag mappings for conversion.
      */
     constructor(options?: {
         tab?: string | undefined;
         eol?: string | undefined;
-        defaultTags?: any;
+        defaultTags?: XMLTags | undefined;
     } | undefined);
     /** @type {string} */
     tab: string;

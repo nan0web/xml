@@ -132,4 +132,21 @@ describe("nano2xml", () => {
 		const expected = `<img src="image.png" alt="An Image" />\n<input type="text" name="username" />`
 		assert.equal(xml, expected)
 	})
+
+	it("should render inline script and style tags correctly?", async () => {
+		//import { HTMLTransformer } from '@nan0web/html'
+		const data = [
+			{ script: 'console.log("hello");' },
+			{ style: '.my-class { color: red; }' },
+		]
+
+		const html = nano2xml(data, {
+			newLine: "",
+			defaultTags: { $cdataTags: ['script', 'style'] }
+		})
+		assert.equal(
+			html,
+			'<script><![CDATA[console.log("hello");]]></script><style><![CDATA[.my-class { color: red; }]]></style>'
+		)
+	})
 })

@@ -3,6 +3,16 @@ import escape from "./escape.js"
 import nano2attrs from "./nano2attrs.js"
 
 /**
+ * @typedef {object} DefaultTagOption
+ * @property {string[]} [$cdataTags]
+ * @property {boolean | string | ((tag: string, content: any) => boolean | string)} [$selfClosed]
+ * @property {object} [$tagAttrs]
+ * @property {string} [$default]
+ * @property {string} [$attrCase]
+ * @property {string} [$attrTrue]
+ */
+
+/**
  * Determine whether a content value should be considered empty.
  * @param {*} content - The content to evaluate.
  * @returns {boolean} True when content is empty.
@@ -68,7 +78,7 @@ function getEmbedTagAttributes(key, $tagAttrs) {
  * @param {Object} [options={}] - Conversion options.
  * @param {string} [options.indent='\t'] - Indentation string.
  * @param {string} [options.newLine='\n'] - New line string.
- * @param {Object} [options.defaultTags={}] - Tag configuration.
+ * @param {DefaultTagOption} [options.defaultTags={}] - Tag configuration.
  * @returns {string} XML string.
  */
 function nano2xml(data, { indent = '\t', newLine = '\n', defaultTags = {} } = {}) {
@@ -108,7 +118,7 @@ function nano2xml(data, { indent = '\t', newLine = '\n', defaultTags = {} } = {}
 					const attrStr = nano2attrs(itemAttrs, defaultTags)
 					let selfClosedLogic = defaultTags.$selfClosed
 					if (typeof selfClosedLogic === 'function') {
-						selfClosedLogic = selfClosedLogic.call(defaultTags, tag, content)
+						selfClosedLogic = selfClosedLogic(tag, content)
 					}
 					const isEmptyContent = isContentEmpty(content)
 					const isSelfClosedTag = !!selfClosedLogic && isEmptyContent
@@ -188,7 +198,7 @@ function nano2xml(data, { indent = '\t', newLine = '\n', defaultTags = {} } = {}
 			const tagStrs = Object.entries(tags).map(([tag, content]) => {
 				let $selfClosed = defaultTags.$selfClosed
 				if (typeof $selfClosed === 'function') {
-					$selfClosed = $selfClosed.call(defaultTags, tag, content)
+					$selfClosed = $selfClosed(tag, content)
 				}
 				const isSelfClosedContent = !!$selfClosed && isContentEmpty(content)
 				const attrStr = nano2attrs(attrs, defaultTags)
@@ -196,7 +206,7 @@ function nano2xml(data, { indent = '\t', newLine = '\n', defaultTags = {} } = {}
 				// Special handling for processing instructions
 				if (tag.startsWith('?')) {
 					const closeStr = $selfClosed || '?>'
-					return `<${tag}${attrStr}${closeStr}`
+					return `${currentIndent}<${tag}${attrStr}${closeStr}`
 				}
 
 				if (isSelfClosedContent) {
@@ -212,6 +222,9 @@ function nano2xml(data, { indent = '\t', newLine = '\n', defaultTags = {} } = {}
 				}
 
 				if (isSingleLine(content)) {
+					if (defaultTags.$cdataTags && defaultTags.$cdataTags.includes(tag)) {
+						return `${fullOpen}<![CDATA[${content}]]>${fullClose}`
+					}
 					return `${fullOpen}${escape(content)}${fullClose}`
 				}
 

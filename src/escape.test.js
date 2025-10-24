@@ -19,4 +19,10 @@ describe("escape()", () => {
 		assert.equal(escape(123), '123')
 		assert.equal(escape(true), 'true')
 	})
+
+	it("How to escape untrusted HTML content safely?", () => {
+		//import { escape } from '@nan0web/html'
+		const unsafe = '<script>alert("xss")</script>'
+		assert.equal(escape(unsafe), '&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;')
+	})
 })

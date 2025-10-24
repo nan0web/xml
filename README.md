@@ -140,7 +140,7 @@ const data = [{ item: 'A' }, { item: 'B' }]
 const xml = nano2xml(data, {
 	indent: '',
 	newLine: '',
-	defaultTags: { '': 'item' }
+	defaultTags: { $default: 'item' }
 })
 console.info(xml) // ← `<item>A</item><item>B</item>`
 ```
@@ -151,7 +151,7 @@ import { nano2xml } from '@nan0web/xml'
 const data = { img: true, $src: 'pic.png' }
 const xml = nano2xml(data, {
 	defaultTags: {
-		$selfClosed: (tag) => tag === 'img' && true,
+		$selfClosed: (tag) => tag === 'img',
 		$attrCase: 'kebab'
 	}
 })
