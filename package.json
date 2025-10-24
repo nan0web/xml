@@ -1,6 +1,6 @@
 {
 	"name": "@nan0web/xml",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "XML transformer and utilities.",
 	"type": "module",
 	"main": "./src/index.js",
