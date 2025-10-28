@@ -4,7 +4,7 @@ XML transformer and utilities.
 
 |[Status](https://github.com/nan0web/monorepo/blob/main/system.md#написання-сценаріїв)|Documentation|Test coverage|Features|Npm version|
 |---|---|---|---|---|
- |🟢 `98.6%` |🧪 [English 🏴󠁧󠁢󠁥󠁮󠁧󠁿](https://github.com/nan0web/xml/blob/main/README.md)<br />[Українською 🇺🇦](https://github.com/nan0web/xml/blob/main/docs/uk/README.md) |🟢 `93.5%` |✅ d.ts 📜 system.md 🕹️ playground |— |
+ |🟢 `98.8%` |🧪 [English 🏴󠁧󠁢󠁥󠁮󠁧󠁿](https://github.com/nan0web/xml/blob/main/README.md)<br />[Українською 🇺🇦](https://github.com/nan0web/xml/blob/main/docs/uk/README.md) |🟢 `93.5%` |✅ d.ts 📜 system.md 🕹️ playground |1.0.3 |
 
 ## Description
 

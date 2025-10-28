@@ -4,7 +4,7 @@
 
 |[Статус](https://github.com/nan0web/monorepo/blob/main/system.md#написання-сценаріїв)|Документація|Покриття тестами|Можливості|Npm версія|
 |---|---|---|---|---|
- |🟢 `98.6%` |🧪 [English 🏴󠁧󠁢󠁥󠁮󠁧󠁿](https://github.com/nan0web/xml/blob/main/README.md)<br />[Українською 🇺🇦](https://github.com/nan0web/xml/blob/main/docs/uk/README.md) |🟢 `93.5%` |✅ d.ts 📜 system.md 🕹️ playground |— |
+ |🟢 `98.8%` |🧪 [English 🏴󠁧󠁢󠁥󠁮󠁧󠁿](https://github.com/nan0web/xml/blob/main/README.md)<br />[Українською 🇺🇦](https://github.com/nan0web/xml/blob/main/docs/uk/README.md) |🟢 `93.5%` |✅ d.ts 📜 system.md 🕹️ playground |1.0.3 |
 
 ## Опис
 
