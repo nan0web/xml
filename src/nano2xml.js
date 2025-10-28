@@ -198,7 +198,7 @@ function nano2xml(data, { indent = '\t', newLine = '\n', defaultTags = {} } = {}
 			const tagStrs = Object.entries(tags).map(([tag, content]) => {
 				let $selfClosed = defaultTags.$selfClosed
 				if (typeof $selfClosed === 'function') {
-					$selfClosed = $selfClosed(tag, content)
+					$selfClosed = $selfClosed.apply($selfClosed, [tag, content])
 				}
 				const isSelfClosedContent = !!$selfClosed && isContentEmpty(content)
 				const attrStr = nano2attrs(attrs, defaultTags)

@@ -23,14 +23,19 @@ describe("nano2xml", () => {
 
 	it('self‑closed handling', () => {
 		const data = { img: true, $src: 'pic.png' }
+		let self
 		const xml = nano2xml(data, {
 			defaultTags: {
-				$selfClosed: (tag) => tag === 'img' && true,
+				$selfClosed: function (tag) {
+					self = this
+					return tag === 'img' && true
+				},
 				$attrCase: 'kebab'
 			}
 		})
 		const expected = '<img src="pic.png" />'
 		assert.equal(xml.trim(), expected)
+		assert.ok(self)
 	})
 
 	it('should handle attributes', () => {
